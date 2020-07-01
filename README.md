@@ -10,9 +10,18 @@ together with GraalVM `native-image` on java11.
 Include this library in your leiningen profile or deps.edn alias so it's
 available on the classpath for GraalVM `native-image`. E.g.:
 
+Relevant config for a leiningen `project.cljc`:
 ``` clojure
 (defproject foo "0.0.1-SNAPSHOT"
   :profiles {:native-image {:dependencies [[borkdude/clj-reflector-graal-java11-fix "0.0.1-graalvm-20.1.0"]]}})
+```
+
+Relevant config for a tools deps `deps.edn`:
+``` clojure
+{:aliases
+ {:native-image {:extra-deps {borkdude/clj-reflector-graal-java11-fix
+                              {:mvn/version "0.0.1-graalvm-20.1.0"
+                               :exclusions [org.graalvm.nativeimage/svm]}}}}}
 ```
 
 Use the right GraalVM version modifier: e.g. `graalvm-20.1.0`. The modifier must exactly match the version of GraalVM
@@ -21,7 +30,7 @@ Use the right GraalVM version modifier: e.g. `graalvm-20.1.0`. The modifier must
 Do NOT distribute this library as part of libraries or applications that are run
 with a JVM. Use it for compiling to native binaries only.
 
-E.g. to produce an uberjar that is fed to `native-image` you can do:
+E.g. for a leiningen project, to produce an uberjar that is fed to `native-image` you can:
 
 ``` shell
 $ lein with-profiles +native-image do clean, uberjar
@@ -31,6 +40,12 @@ and then:
 
 ``` shell
 $ native-image -jar target/foo-0.0.1-SNAPSHOT-standalone.jar
+```
+
+For a tools deps project, your compile script would get the classspath for `native-image` via: 
+
+```shell
+clojure -A:native-image -Spath
 ```
 
 ## The problem
